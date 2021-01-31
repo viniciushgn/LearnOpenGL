@@ -1,11 +1,19 @@
-
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
 #include <iostream>
 
+void framebuffer_size_callback(GLFWwindow* window, int largura, int altura)
+{
+    glViewport(0,0,largura,altura);
+}
 
-void framebuffer_size_callback(GLFWwindow* window, int largura, int altura);
+void processaImput(GLFWwindow* window){
+    if(glfwGetKey(window,GLFW_KEY_ESCAPE) == GLFW_PRESS){
+        glfwSetWindowShouldClose(window, true);
+    }
+
+}
 
 int main()
 {
@@ -33,11 +41,13 @@ int main()
     }
 
     glViewport(0,0,800,600);
-
+    glClearColor(0.2f,0.3f,0.3f,1.0f);
 
 //--------------------------------------------------------------------------------------
 //LOOP----------------------------------------------------------------------------------
 while(!glfwWindowShouldClose(janela)){
+    processaImput(janela);
+    glClear(GL_COLOR_BUFFER_BIT);
     glfwSwapBuffers(janela);
     glfwPollEvents();
 }
@@ -49,8 +59,4 @@ return 0;
 }
 
 
-void framebuffer_size_callback(GLFWwindow* window, int largura, int altura)
-{
-    glViewport(0,0,largura,altura);
-}
 
