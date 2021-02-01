@@ -70,7 +70,7 @@ unsigned int VBO;
 glGenBuffers(1,&VBO);
 glBindBuffer(GL_ARRAY_BUFFER, VBO);
 glBufferData(GL_ARRAY_BUFFER,sizeof(vertices),vertices,GL_STATIC_DRAW);
-
+//SHADERS-------------------------------------------------------------------------------
 //Shader Vertex
 unsigned int vertexShader;
 vertexShader = glCreateShader(GL_VERTEX_SHADER);
@@ -98,8 +98,23 @@ if(!success){
     std::cout << "ERROR::SHADER::VERTEX::COMPILATION_FAILED\n" << infoLog << std::endl;
 
 }
+//Shader Program
+unsigned int shaderProgram;
+shaderProgram = glCreateProgram();
+
+glAttachShader(shaderProgram, vertexShader);
+glAttachShader(shaderProgram, fragmentShader);
+glLinkProgram(shaderProgram);
+
+glDeleteShader(vertexShader);
+glDeleteShader(fragmentShader);
+
+glUseProgram(shaderProgram);
 
 //--------------------------------------------------------------------------------------
+
+//--------------------------------------------------------------------------------------
+
 //LOOP----------------------------------------------------------------------------------
 while(!glfwWindowShouldClose(janela)){
     processaImput(janela);
