@@ -3,6 +3,8 @@
 
 #include <iostream>
 
+#include <cmath> //sin function for BlueLevel
+
 void framebuffer_size_callback(GLFWwindow* window, int largura, int altura)
 {
     glViewport(0,0,largura,altura);
@@ -28,6 +30,8 @@ const char *vertexShaderSource = "#version 330 core\n"
 "void main(){\n"
     "gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);\n"
 "}\0";
+//usei layout (location = 0) pra falar de onde eu estou recebendo e onde vou colocar (no vetor vec3 aPos) 
+
 //------------------------------------------------------------------------------------
 //FRAGMENT SHADER CODE----------------------------------------------------------------
 const char *fragmentShaderSource = "#version 330 core\n"
@@ -38,8 +42,9 @@ const char *fragmentShaderSource = "#version 330 core\n"
 
 const char *fragmentShaderSource2 = "#version 330 core\n"
 "out vec4 FragColor;\n"
+"uniform vec4 ourColor;\n"
 "void main(){\n"
-"FragColor = vec4(1.0f,1.0f,0.0f,1.0f);\n"
+"FragColor = ourColor;\n"
 "}\0";
 //------------------------------------------------------------------------------------
 int main()
@@ -206,7 +211,11 @@ glEnableVertexAttribArray(0);
 //glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 
 //--------------------------------------------------------------------------------------
-
+//CHANGE COLOR--------------------------------------------------------------------------
+float timeNow = glfwGetTime();
+float blueLevel = (sin(timeNow)/ 2.0f) + 0.5f;
+int uniformColorLocation = glGetUniformLocation(shaderProgram2, "ourColor");
+//--------------------------------------------------------------------------------------
 //LOOP----------------------------------------------------------------------------------
 while(!glfwWindowShouldClose(janela)){
     processaImput(janela);
@@ -218,6 +227,11 @@ while(!glfwWindowShouldClose(janela)){
 
     glUseProgram(shaderProgram2);                                                                                                                                                
     glBindVertexArray(VAO2);
+
+    timeNow = glfwGetTime();
+    glUniform4f(uniformColorLocation, 1.0f, 1.0f, blueLevel, 1.0f);
+    blueLevel = (sin(timeNow)/ 4.0f) + 0.75f;
+
     glDrawArrays(GL_TRIANGLES, 0, 3);
     glfwSwapBuffers(janela);
     glfwPollEvents();
