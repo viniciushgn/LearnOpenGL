@@ -8,6 +8,8 @@
 			"args": [
 				"-g",
 				"-std=c++17",
+				"-static-libgcc",
+				"-static-libstdc++",
 				"-I${workspaceFolder}/include",
 				"-L${workspaceFolder}/lib",
 				"${workspaceFolder}/src/\\*.cpp",

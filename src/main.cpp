@@ -5,6 +5,8 @@
 
 #include <cmath> //sin function for BlueLevel
 
+#include <shaders/ShaderClass.h> //
+
 void framebuffer_size_callback(GLFWwindow* window, int largura, int altura)
 {
     glViewport(0,0,largura,altura);
@@ -23,41 +25,6 @@ void processaImput(GLFWwindow* window){
         
 }
 
-//VERTEX SHADER CODE------------------------------------------------------------------
-const char *vertexShaderSource1 = "#version 330 core\n"
-"layout (location = 0) in vec3 aPos;\n"
-"layout (location = 1) in vec3 aColor;\n"
-
-"out vec3 ourColor;\n"
-"void main(){\n"
-    "gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);\n"
-    "ourColor = aColor;\n"
-"}\0";
-
-const char *vertexShaderSource = "#version 330 core\n"
-"layout (location = 0) in vec3 aPos;\n"
-
-"void main(){\n"
-    "gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);\n"
-"}\0";
-//usei layout (location = 0) pra falar de onde eu estou recebendo e onde vou colocar (no vetor vec3 aPos) 
-
-//------------------------------------------------------------------------------------
-//FRAGMENT SHADER CODE----------------------------------------------------------------
-const char *fragmentShaderSource = "#version 330 core\n"
-"out vec4 FragColor;\n"
-"in vec3 ourColor;\n"
-"void main(){\n"
-"FragColor = vec4(ourColor,1.0f);\n"
-"}\0";
-
-const char *fragmentShaderSource2 = "#version 330 core\n"
-"out vec4 FragColor;\n"
-"uniform vec4 ourColor;\n"
-"void main(){\n"
-"FragColor = ourColor;\n"
-"}\0";
-//------------------------------------------------------------------------------------
 int main()
 {
 //GLFW INICIALIZANDO------------------------------------------------------------------
@@ -87,92 +54,13 @@ int main()
     glClearColor(0.2f,0.3f,0.3f,1.0f);
 
 //--------------------------------------------------------------------------------------
-//MODEL---------------------------------------------------------------------------------
-
-
 
 //SHADERS-------------------------------------------------------------------------------
-//Shader Vertex 1
-unsigned int vertexShader1;
-vertexShader1 = glCreateShader(GL_VERTEX_SHADER);
-glShaderSource(vertexShader1, 1, &vertexShaderSource1, NULL);
-glCompileShader(vertexShader1);
-//Errors Compiling?
-int  success;
-char infoLog[512];
-glGetShaderiv(vertexShader1, GL_COMPILE_STATUS, &success);
-if(!success)
-{
-    glGetShaderInfoLog(vertexShader1, 512, NULL, infoLog);
-    std::cout << "ERROR::SHADER::VERTEX::COMPILATION_FAILED\n" << infoLog << std::endl;
-}
-//Shader Vertex
-unsigned int vertexShader;
-vertexShader = glCreateShader(GL_VERTEX_SHADER);
-glShaderSource(vertexShader, 1, &vertexShaderSource, NULL);
-glCompileShader(vertexShader);
-//Errors Compiling?
-glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &success);
-if(!success)
-{
-    glGetShaderInfoLog(vertexShader, 512, NULL, infoLog);
-    std::cout << "ERROR::SHADER::VERTEX::COMPILATION_FAILED\n" << infoLog << std::endl;
-}
-//Shader Fragment 1
-unsigned int fragmentShader;
-fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-glShaderSource(fragmentShader, 1, &fragmentShaderSource, NULL);
-glCompileShader(fragmentShader);
-//Errors Compiling?
-glGetShaderiv(fragmentShader, GL_COMPILE_STATUS, &success);
-if(!success){
 
-    glGetShaderInfoLog(fragmentShader,512,NULL, infoLog);
-    std::cout << "ERROR::SHADER::VERTEX::COMPILATION_FAILED\n" << infoLog << std::endl;
+Shader shader1("./include/shaders/vertexShaderTRGB.vs", "./include/shaders/fragmentShaderTRGB.fs");
+Shader shader2("./include/shaders/vertexShaderGrad.vs", "./include/shaders/fragmentShaderGrad.fs");
 
-}
-//Shader Fragment 2
-unsigned int fragmentShader2;
-fragmentShader2 = glCreateShader(GL_FRAGMENT_SHADER);
-glShaderSource(fragmentShader2, 1, &fragmentShaderSource2, NULL);
-glCompileShader(fragmentShader2);
-//Errors Compiling?
-glGetShaderiv(fragmentShader2, GL_COMPILE_STATUS, &success);
-if(!success){
-
-    glGetShaderInfoLog(fragmentShader2,512,NULL, infoLog);
-    std::cout << "ERROR::SHADER::VERTEX::COMPILATION_FAILED\n" << infoLog << std::endl;
-
-}
-
-//Shader Program 1
-unsigned int shaderProgram;
-shaderProgram = glCreateProgram();
-
-glAttachShader(shaderProgram, vertexShader1);
-glAttachShader(shaderProgram, fragmentShader);
-glLinkProgram(shaderProgram);
-
-glDeleteShader(fragmentShader);
-glDeleteShader(vertexShader1);
-
-glUseProgram(shaderProgram);
-
-//Shader Program 2
-unsigned int shaderProgram2;
-shaderProgram2 = glCreateProgram();
-
-glAttachShader(shaderProgram2, vertexShader);
-glAttachShader(shaderProgram2, fragmentShader2);
-glLinkProgram(shaderProgram2);
-
-glDeleteShader(vertexShader);
-glDeleteShader(fragmentShader2);
-
-glUseProgram(shaderProgram2);
-
-//--------------------------------------------------------------------------------------
-
+shader2.use();
 //--------------------------------------------------------------------------------------
 
 //VAO-----------------------------------------------------------------------------------
@@ -240,22 +128,23 @@ glEnableVertexAttribArray(0);
 //CHANGE COLOR--------------------------------------------------------------------------
 float timeNow = glfwGetTime();
 float blueLevel = (sin(timeNow)/ 2.0f) + 0.5f;
-int uniformColorLocation = glGetUniformLocation(shaderProgram2, "ourColor");
+shader2.setFloat("ourColor", blueLevel);
+
 //--------------------------------------------------------------------------------------
 //LOOP----------------------------------------------------------------------------------
 while(!glfwWindowShouldClose(janela)){
     processaImput(janela);
     glClear(GL_COLOR_BUFFER_BIT);
-    glUseProgram(shaderProgram);
+    shader1.use();
     glBindVertexArray(VAO);
     glDrawArrays(GL_TRIANGLES, 0,3);
     //glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, (void*)0);
 
-    glUseProgram(shaderProgram2);                                                                                                                                                
+    shader2.use();                                                                                                                                              
     glBindVertexArray(VAO2);
 
     timeNow = glfwGetTime();
-    glUniform4f(uniformColorLocation, 1.0f, 1.0f, blueLevel, 1.0f);
+    shader2.setFloat("ourColor", blueLevel);
     blueLevel = (sin(timeNow)/ 4.0f) + 0.75f;
 
     glDrawArrays(GL_TRIANGLES, 0, 3);
