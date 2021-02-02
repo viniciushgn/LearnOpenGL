@@ -12,7 +12,13 @@ void processaImput(GLFWwindow* window){
     if(glfwGetKey(window,GLFW_KEY_ESCAPE) == GLFW_PRESS){
         glfwSetWindowShouldClose(window, true);
     }
-
+    if(glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS){
+        glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+    }
+    if(glfwGetKey(window, GLFW_KEY_F) == GLFW_PRESS){
+        glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+    }
+        
 }
 
 //VERTEX SHADER CODE------------------------------------------------------------------
@@ -28,6 +34,12 @@ const char *fragmentShaderSource = "#version 330 core\n"
 "out vec4 FragColor;\n"
 "void main(){\n"
 "FragColor = vec4(1.0f,0.5f,0.2f,1.0f);\n"
+"}\0";
+
+const char *fragmentShaderSource2 = "#version 330 core\n"
+"out vec4 FragColor;\n"
+"void main(){\n"
+"FragColor = vec4(1.0f,1.0f,0.0f,1.0f);\n"
 "}\0";
 //------------------------------------------------------------------------------------
 int main()
@@ -60,11 +72,7 @@ int main()
 
 //--------------------------------------------------------------------------------------
 //MODEL---------------------------------------------------------------------------------
-float vertices[] = {
-    -0.5f,-0.5,0.0f,
-    0.5f,-0.5f,0.0f,
-    0.0f,0.5f,0.0f
-};
+
 
 
 //SHADERS-------------------------------------------------------------------------------
@@ -82,7 +90,7 @@ if(!success)
     glGetShaderInfoLog(vertexShader, 512, NULL, infoLog);
     std::cout << "ERROR::SHADER::VERTEX::COMPILATION_FAILED\n" << infoLog << std::endl;
 }
-//Shader Fragment
+//Shader Fragment 1
 unsigned int fragmentShader;
 fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
 glShaderSource(fragmentShader, 1, &fragmentShaderSource, NULL);
@@ -95,7 +103,21 @@ if(!success){
     std::cout << "ERROR::SHADER::VERTEX::COMPILATION_FAILED\n" << infoLog << std::endl;
 
 }
-//Shader Program
+//Shader Fragment 2
+unsigned int fragmentShader2;
+fragmentShader2 = glCreateShader(GL_FRAGMENT_SHADER);
+glShaderSource(fragmentShader2, 1, &fragmentShaderSource2, NULL);
+glCompileShader(fragmentShader2);
+//Errors Compiling?
+glGetShaderiv(fragmentShader2, GL_COMPILE_STATUS, &success);
+if(!success){
+
+    glGetShaderInfoLog(fragmentShader2,512,NULL, infoLog);
+    std::cout << "ERROR::SHADER::VERTEX::COMPILATION_FAILED\n" << infoLog << std::endl;
+
+}
+
+//Shader Program 1
 unsigned int shaderProgram;
 shaderProgram = glCreateProgram();
 
@@ -103,30 +125,85 @@ glAttachShader(shaderProgram, vertexShader);
 glAttachShader(shaderProgram, fragmentShader);
 glLinkProgram(shaderProgram);
 
-glDeleteShader(vertexShader);
 glDeleteShader(fragmentShader);
 
-glVertexAttribPointer(0,3,GL_FLOAT, GL_FALSE,3*sizeof(float), (void*)0);
-glEnableVertexAttribArray(0);
-
 glUseProgram(shaderProgram);
+
+//Shader Program 2
+unsigned int shaderProgram2;
+shaderProgram2 = glCreateProgram();
+
+glAttachShader(shaderProgram2, vertexShader);
+glAttachShader(shaderProgram2, fragmentShader2);
+glLinkProgram(shaderProgram2);
+
+glDeleteShader(vertexShader);
+glDeleteShader(fragmentShader2);
+
+glUseProgram(shaderProgram2);
 
 //--------------------------------------------------------------------------------------
 
 //--------------------------------------------------------------------------------------
 
 //VAO-----------------------------------------------------------------------------------
+
+float vertices[] = {
+     0.5f,  0.5f, 0.0f,  // top right
+     0.5f, -0.5f, 0.0f,  // bottom right
+//    -0.5f, -0.5f, 0.0f,  // bottom left
+    -0.5f,  0.5f, 0.0f,   // top left 
+};
+
+float vertices2[] = {
+    -0.6f,  0.5f, 0.0f,   
+    -0.6f, -0.5f, 0.0f,
+    0.4f, -0.5f, 0.0f
+};
+
+unsigned int indices[] = {
+    0,1,3,3,2,1
+};
+
+//1
+
 unsigned int VAO;
 glGenVertexArrays(1, &VAO);
 unsigned int VBO;
 glGenBuffers(1,&VBO);
+//unsigned int EBO;
+//glGenBuffers(1,&EBO);
 
 
 glBindVertexArray(VAO);
+
 glBindBuffer(GL_ARRAY_BUFFER, VBO);
 glBufferData(GL_ARRAY_BUFFER,sizeof(vertices),vertices,GL_STATIC_DRAW);
 glVertexAttribPointer(0,3,GL_FLOAT,GL_FALSE, 3*sizeof(float),(void*)0);
 glEnableVertexAttribArray(0);
+
+//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+//glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+
+//2
+
+unsigned int VAO2;
+glGenVertexArrays(1, &VAO2);
+unsigned int VBO2;
+glGenBuffers(1,&VBO2);
+//unsigned int EBO;
+//glGenBuffers(1,&EBO);
+
+
+glBindVertexArray(VAO2);
+
+glBindBuffer(GL_ARRAY_BUFFER, VBO2);
+glBufferData(GL_ARRAY_BUFFER,sizeof(vertices2),vertices2,GL_STATIC_DRAW);
+glVertexAttribPointer(0,3,GL_FLOAT,GL_FALSE, 3*sizeof(float),(void*)0);
+glEnableVertexAttribArray(0);
+
+//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+//glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 
 //--------------------------------------------------------------------------------------
 
@@ -134,7 +211,14 @@ glEnableVertexAttribArray(0);
 while(!glfwWindowShouldClose(janela)){
     processaImput(janela);
     glClear(GL_COLOR_BUFFER_BIT);
+    glUseProgram(shaderProgram);
+    glBindVertexArray(VAO);
     glDrawArrays(GL_TRIANGLES, 0,3);
+    //glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, (void*)0);
+
+    glUseProgram(shaderProgram2);                                                                                                                                                
+    glBindVertexArray(VAO2);
+    glDrawArrays(GL_TRIANGLES, 0, 3);
     glfwSwapBuffers(janela);
     glfwPollEvents();
 }
