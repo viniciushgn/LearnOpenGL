@@ -10,3 +10,6 @@ VSCode compilando usando o arquivo task.json, não consegui gerar o projeto GLFW
 Código default do launch.json modificado para executar o executável gerado pelo build na pasta win_build.
 
 Documentação relevante para entender os arquivos .json usados para build (task.json) e run (launch.json).
+
+(Dúvida Resolvida) Como o EBO (element buffer object) sabe dos dados do vértice? 
+O EBO quando binded ao VAO controla quais valores recebidos pelo vetor de atributos será usado. Ou seja, TODOS os atributos, incluindo cor, normal, textura, o que for. Para usar o EBO, potanto, precisamos decidir não só os valores de posição (no caso colocamos ele como atributo de index 0) mas também todos os outros possíveis. Por isso uma declaração mais explícita dos vértices não é necessária, tratamos de todos os atributos com os valores dos índices do EBO. Usamos só um EBO por VAO. 
