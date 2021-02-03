@@ -7,7 +7,9 @@
 
 #include <shaders/ShaderClass.h> //loading and setting up shader programs
 
+#define STB_IMAGE_IMPLEMENTATION
 #include <imageLoader/stb_image.h> //loading images
+
 
 void framebuffer_size_callback(GLFWwindow* window, int largura, int altura)
 {
@@ -60,38 +62,57 @@ int main()
 //SHADERS-------------------------------------------------------------------------------
 
 Shader shader1("./include/shaders/vertexShaderTRGB.vs", "./include/shaders/fragmentShaderTRGB.fs");
-Shader shader2("./include/shaders/vertexShaderGrad.vs", "./include/shaders/fragmentShaderGrad.fs");
+shader1.use();
 
-shader2.use();
+
 //--------------------------------------------------------------------------------------
 
 //VAO-----------------------------------------------------------------------------------
 
-float vertices[] = {           //color
-     0.5f,  0.5f, 0.0f, 1.0f,0.0f,0.0f,  // top right
-     0.5f, -0.5f, 0.0f, 0.0f,1.0f,0.0f,  // bottom right
-//    -0.5f, -0.5f, 0.0f,  // bottom left
-    -0.5f,  0.5f, 0.0f, 0.0f,0.0f,1.0f   // top left 
+
+//MODELS------------------------------------------------
+float vertices[] = {               //color                texture coordinate
+     0.5f,  0.5f, 0.0f,          1.0f,0.0f,0.0f,              // top right
+     0.5f, -0.5f, 0.0f,          0.0f,1.0f,0.0f,              // bottom right
+    -0.5f, -0.5f, 0.0f,          1.0f,0.0f,0.0f, // bottom left
+    -0.5f,  0.5f, 0.0f,          0.0f,0.0f,1.0f,               // top left 
 };
 
-float vertices2[] = {
-    -0.6f,  0.5f, 0.0f,   
-    -0.6f, -0.5f, 0.0f,
-    0.4f, -0.5f, 0.0f
-};
 
 unsigned int indices[] = {
-    0,1,3,3,2,1
+    0,1,3,1,2,3
 };
 
+int largura, altura, nrChannels;
+unsigned char *containerTexData = stbi_load("./assets/texture/container.jpg", &largura, &altura, &nrChannels, 0);
+
+unsigned int containerTexture;
+glGenTextures(1, &containerTexture);
+
+glBindTexture(GL_TEXTURE_2D, containerTexture);
+glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, largura, altura, 0, GL_RGB, GL_UNSIGNED_BYTE, containerTexData);
+glGenerateMipmap(GL_TEXTURE_2D);
+
+glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);	
+glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+if(!containerTexData)
+{
+    std::cout << "Failed to load texture" << std::endl;
+}
+
+stbi_image_free(containerTexData);
+//------------------------------------------------------
 //1
 
 unsigned int VAO;
 glGenVertexArrays(1, &VAO);
 unsigned int VBO;
 glGenBuffers(1,&VBO);
-//unsigned int EBO;
-//glGenBuffers(1,&EBO);
+unsigned int EBO;
+glGenBuffers(1,&EBO);
 
 
 glBindVertexArray(VAO);
@@ -103,34 +124,13 @@ glEnableVertexAttribArray(0);
 glVertexAttribPointer(1,3,GL_FLOAT,GL_FALSE, 6*sizeof(float),(void*)(3 * sizeof(float)));
 glEnableVertexAttribArray(1);
 
-//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-//glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 
-//2
-
-unsigned int VAO2;
-glGenVertexArrays(1, &VAO2);
-unsigned int VBO2;
-glGenBuffers(1,&VBO2);
-//unsigned int EBO;
-//glGenBuffers(1,&EBO);
-
-
-glBindVertexArray(VAO2);
-
-glBindBuffer(GL_ARRAY_BUFFER, VBO2);
-glBufferData(GL_ARRAY_BUFFER,sizeof(vertices2),vertices2,GL_STATIC_DRAW);
-glVertexAttribPointer(0,3,GL_FLOAT,GL_FALSE, 3*sizeof(float),(void*)0);
-glEnableVertexAttribArray(0);
-
-//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-//glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 
 //--------------------------------------------------------------------------------------
 //CHANGE COLOR--------------------------------------------------------------------------
-float timeNow = glfwGetTime();
-float blueLevel = (sin(timeNow)/ 2.0f) + 0.5f;
-shader2.setFloat("ourColor", blueLevel);
+
 
 //--------------------------------------------------------------------------------------
 //LOOP----------------------------------------------------------------------------------
@@ -139,17 +139,9 @@ while(!glfwWindowShouldClose(janela)){
     glClear(GL_COLOR_BUFFER_BIT);
     shader1.use();
     glBindVertexArray(VAO);
-    glDrawArrays(GL_TRIANGLES, 0,3);
-    //glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, (void*)0);
+    //glDrawArrays(GL_TRIANGLES, 0,3);
+    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
-    shader2.use();                                                                                                                                              
-    glBindVertexArray(VAO2);
-
-    timeNow = glfwGetTime();
-    shader2.setFloat("ourColor", blueLevel);
-    blueLevel = (sin(timeNow)/ 4.0f) + 0.75f;
-
-    glDrawArrays(GL_TRIANGLES, 0, 3);
     glfwSwapBuffers(janela);
     glfwPollEvents();
 }
