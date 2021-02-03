@@ -5,7 +5,9 @@
 
 #include <cmath> //sin function for BlueLevel
 
-#include <shaders/ShaderClass.h> //
+#include <shaders/ShaderClass.h> //loading and setting up shader programs
+
+#include <imageLoader/stb_image.h> //loading images
 
 void framebuffer_size_callback(GLFWwindow* window, int largura, int altura)
 {
