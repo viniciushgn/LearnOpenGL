@@ -7,6 +7,10 @@
 
 #include <shaders/ShaderClass.h> //loading and setting up shader programs
 
+#include <glm/glm.hpp> //GLM matrizes e vetores
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
+
 #define STB_IMAGE_IMPLEMENTATION
 #include <imageLoader/stb_image.h> //loading images
 
@@ -172,9 +176,21 @@ shader1.use();
 shader1.setInt("ourTexture", 0);
 shader1.setInt("mixTexture", 1);
 shader1.setFloat("mixParameter", 0.2);
+
 //--------------------------------------------------------------------------------------
 //CHANGE COLOR--------------------------------------------------------------------------
 
+//testando vetores
+glm::mat4 trans = glm::mat4(1.0f);
+
+trans = glm::rotate(trans, glm::radians(90.0f), glm::vec3(0.0f,0.0f,1.0f));
+trans = glm::scale(trans, glm::vec3(2.0f,2.0f,2.0f));
+
+//fim
+
+
+unsigned int transformLocal = glGetUniformLocation(shader1.ID, "transform");
+glUniformMatrix4fv(transformLocal, 1,GL_FALSE, glm::value_ptr(trans));
 
 //--------------------------------------------------------------------------------------
 //LOOP----------------------------------------------------------------------------------
@@ -185,6 +201,31 @@ while(!glfwWindowShouldClose(janela)){
     shader1.use();
     glBindVertexArray(VAO);
     //glDrawArrays(GL_TRIANGLES, 0,3);
+
+    glm::mat4 trans = glm::mat4(1.0f);
+
+
+    trans = glm::translate(trans, glm::vec3(1.0f,0.0f,0.0f));
+    
+    trans = glm::rotate(trans, (float)glfwGetTime(), glm::vec3(0.0f,0.0f,1.0f));
+    trans = glm::scale(trans, glm::vec3(0.5f,0.5f,0.5f));
+
+
+
+    glUniformMatrix4fv(transformLocal, 1,GL_FALSE, glm::value_ptr(trans));
+
+    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+
+    trans = glm::mat4(1.0f);
+
+    trans = glm::translate(trans, glm::vec3(-1.0f,0.0f,0.0f));
+    trans = glm::rotate(trans, (float)glfwGetTime(), glm::vec3(0.0f,0.0f,1.0f));
+
+    trans = glm::scale(trans, glm::vec3(2.0f,2.0f,2.0f));
+
+
+    glUniformMatrix4fv(transformLocal, 1,GL_FALSE, glm::value_ptr(trans));
+
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
     glfwSwapBuffers(janela);
