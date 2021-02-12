@@ -239,12 +239,12 @@ model = glm::rotate(model, glm::radians(-55.0f), glm::vec3(1.0f,0.0f,0.0f));
 //movimentar o mundo para alinhar onde a câmera está (se queremos ir com a câmera para trás jogamos o mundo para frente)
 //view matrix
 glm::mat4 view = glm::mat4(1.0f);
-view = glm::translate(view, glm::vec3(0.0f,0.0f,-3.0f));
+view = glm::translate(view, glm::vec3(0.0f,0.0f,-2.0f));
 
 //cortar o que está fora do frustrum  e mapear pro range [-1,1]
 //projection matrix
 glm::mat4 projection;
-projection = glm::perspective(glm::radians(45.0f), 800.0f/600.0f, 0.1f, 100.0f);
+projection = glm::perspective(glm::radians(90.0f), 800.0f/600.0f, 0.1f, 100.0f);
 
 //agora multiplicamos os dados passados ao glPosition por tudo isso usando uniform!
 //e passamos as matrizes pro shader pelo uniform!
@@ -264,16 +264,11 @@ glUniformMatrix4fv(projectionuniformLocal, 1, GL_FALSE, glm::value_ptr(projectio
 //CHANGE COLOR--------------------------------------------------------------------------
 
 //testando vetores
-glm::mat4 trans = glm::mat4(1.0f);
 
-trans = glm::rotate(trans, glm::radians(90.0f), glm::vec3(0.0f,0.0f,1.0f));
-//trans = glm::scale(trans, glm::vec3(2.0f,2.0f,2.0f));
 
 //fim
 
 
-unsigned int transformLocal = glGetUniformLocation(shader1.ID, "transform");
-glUniformMatrix4fv(transformLocal, 1,GL_FALSE, glm::value_ptr(trans));
 
 //--------------------------------------------------------------------------------------
 
@@ -290,24 +285,16 @@ while(!glfwWindowShouldClose(janela)){
     glBindVertexArray(VAO);
     //glDrawArrays(GL_TRIANGLES, 0,3);
 
-    glm::mat4 trans = glm::mat4(1.0f);
-    
 
-    trans = glm::translate(trans, glm::vec3(0.0f,0.0f,0.0f));
-    
-    trans = glm::rotate(trans, (float)glfwGetTime(), glm::vec3(0.5f,0.0f,1.0f));
-//    trans = glm::scale(trans, glm::vec3(2.0f,2.0f,2.0f));
-
-
-
-    glUniformMatrix4fv(transformLocal, 1,GL_FALSE, glm::value_ptr(trans));
-    glDrawArrays(GL_TRIANGLES, 0, 36);
 
 for(int i = 0; i < 10; i++){
     glm::mat4 model = glm::mat4(1.0f);
     model = glm::translate(model, cubePositions[i]);
     float angle = 20.0f * i; 
     model = glm::rotate(model, glm::radians(angle), glm::vec3(1.0f, 0.3f, 0.5f));
+    if(i%3 == 0){
+        model = glm::rotate(model, (float)glfwGetTime(), glm::vec3(0.5f,0.0f,1.0f));
+        }
     glUniformMatrix4fv(modeluniformLocal, 1, GL_FALSE, glm::value_ptr(model));
     glDrawArrays(GL_TRIANGLES, 0, 36);
 }
