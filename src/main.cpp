@@ -241,6 +241,18 @@ model = glm::rotate(model, glm::radians(-55.0f), glm::vec3(1.0f,0.0f,0.0f));
 glm::mat4 view = glm::mat4(1.0f);
 view = glm::translate(view, glm::vec3(0.0f,0.0f,-2.0f));
 
+//CAMERA---------------
+glm::vec3 cameraPos = glm::vec3(0.0f,0.0f,3.0f);
+glm::vec3 cameraTarget = glm::vec3(0.0f,0.0f,0.0f);
+glm::vec3 cameraReverseDirection = glm::normalize(cameraPos - cameraTarget);
+
+//getting the right vector 
+glm::vec3 up = glm::vec3(0.0f,1.0f,0.0f);
+glm::vec3 cameraRight = glm::normalize(glm::cross(up, cameraReverseDirection));
+
+glm::vec3 cameraUp = glm::normalize(glm::cross(cameraReverseDirection, cameraRight));
+//---------------------
+
 //cortar o que está fora do frustrum  e mapear pro range [-1,1]
 //projection matrix
 glm::mat4 projection;
