@@ -24,11 +24,16 @@ public:
         // ensure ifstream objects can throw exceptions:
         vShaderFile.exceptions (std::ifstream::failbit | std::ifstream::badbit);
         fShaderFile.exceptions (std::ifstream::failbit | std::ifstream::badbit);
+        std::cout << "TEST8" << std::endl;
         try 
         {
             // open files
+        std::cout << "TEST99" << std::endl;
+
             vShaderFile.open(vertexPath);
             fShaderFile.open(fragmentPath);
+        std::cout << "TEST88" << std::endl;
+
             std::stringstream vShaderStream, fShaderStream;
             // read file's buffer contents into streams
             vShaderStream << vShaderFile.rdbuf();
@@ -44,8 +49,10 @@ public:
         {
             std::cout << "ERROR::SHADER::FILE_NOT_SUCCESFULLY_READ" << std::endl;
         }
+        std::cout << "TEST9" << std::endl;
         const char* vShaderCode = vertexCode.c_str();
         const char * fShaderCode = fragmentCode.c_str();
+        std::cout << "TEST10" << std::endl;
         // 2. compile shaders
         unsigned int vertex, fragment;
         // vertex shader

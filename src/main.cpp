@@ -66,7 +66,7 @@ int main()
 
     glViewport(0,0,800,600);
     glClearColor(0.2f,0.3f,0.3f,1.0f);
-
+std::cout << "TEST3" << std::endl;
 //--------------------------------------------------------------------------------------
 
 //SHADERS-------------------------------------------------------------------------------
@@ -74,7 +74,7 @@ int main()
 Shader shader1("./include/shaders/vertexShaderTRGB.vs", "./include/shaders/fragmentShaderTRGB.fs");
 shader1.use();
 
-
+std::cout << "TEST2" << std::endl;
 //--------------------------------------------------------------------------------------
 
 //VAO-----------------------------------------------------------------------------------
@@ -144,6 +144,7 @@ unsigned int indices[] = {
 */
 //1
 int largura, altura, nrChannels;
+std::cout << "TEST1" << std::endl;
 unsigned char *containerTexData = stbi_load("./assets/texture/container.jpg", &largura, &altura, &nrChannels, 0);
 
 unsigned int containerTexture;
@@ -238,8 +239,6 @@ model = glm::rotate(model, glm::radians(-55.0f), glm::vec3(1.0f,0.0f,0.0f));
 
 //movimentar o mundo para alinhar onde a câmera está (se queremos ir com a câmera para trás jogamos o mundo para frente)
 //view matrix
-glm::mat4 view = glm::mat4(1.0f);
-view = glm::translate(view, glm::vec3(0.0f,0.0f,-2.0f));
 
 //CAMERA---------------
 glm::vec3 cameraPos = glm::vec3(0.0f,0.0f,3.0f);
@@ -251,6 +250,10 @@ glm::vec3 up = glm::vec3(0.0f,1.0f,0.0f);
 glm::vec3 cameraRight = glm::normalize(glm::cross(up, cameraReverseDirection));
 
 glm::vec3 cameraUp = glm::normalize(glm::cross(cameraReverseDirection, cameraRight));
+
+//... funcao faz tudo isso
+glm::mat4 view;
+view = glm::lookAt(glm::vec3(0.0f,0.0f,3.0f), glm::vec3(0.0f,0.0f,0.0f), glm::vec3(0.0f,1.0f,0.0f));
 //---------------------
 
 //cortar o que está fora do frustrum  e mapear pro range [-1,1]
@@ -297,6 +300,12 @@ while(!glfwWindowShouldClose(janela)){
     glBindVertexArray(VAO);
     //glDrawArrays(GL_TRIANGLES, 0,3);
 
+    float radius = 10.0f;
+    float camX = sin(glfwGetTime()) * radius;
+    float camZ = cos(glfwGetTime()) * radius;
+    glm::mat4 view;
+    view = glm::lookAt(glm::vec3(camX, 0.0f, camZ), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f,1.0f,0.0f));
+    glUniformMatrix4fv(viewuniformLocal, 1, GL_FALSE, glm::value_ptr(view));
 
 
 for(int i = 0; i < 10; i++){
